@@ -22,8 +22,11 @@ public final class NetherTreePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        this.saveDefaultConfig();
         this.getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         this.getServer().getPluginManager().registerEvents(new StructureGrowListener(this), this);
+
+        this.getConfig().addDefault("generation.set-non-persistent-tag", true);
     }
 
     @Override
@@ -41,8 +44,17 @@ public final class NetherTreePlugin extends JavaPlugin {
             }
 
             DecayRunnable runnable = new DecayRunnable(this, new Random(), randomTickSpeed);
-            runnable.runTaskTimer(this, 3L, 27L / randomTickSpeed);
+            runnable.runTaskTimer(this, 3L, 9L);
             return runnable;
         });
+    }
+
+    public void unregisterRunnable(DecayRunnable runnable) {
+        for (UUID uuid : this.runnables.keySet()) {
+            if (this.runnables.get(uuid).equals(runnable)) {
+                runnable.cancel();
+                this.runnables.remove(uuid);
+            }
+        }
     }
 }

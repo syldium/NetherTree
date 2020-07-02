@@ -1,68 +1,92 @@
 package com.github.syldium.nethertree.runnable;
 
+import com.github.syldium.nethertree.NetherTreePlugin;
+import com.github.syldium.nethertree.util.NetherTree;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class DecayRunnable extends BukkitRunnable {
 
-    private final JavaPlugin plugin;
+    private final NetherTreePlugin plugin;
     private final Random random;
-    private final List<Block> scheduledBlocks;
+    private final Map<Long, List<Block>> scheduledBlocks;
+    private final int randomTickSpeed;
 
-    private final int base;
-    private final int group;
-
-    public DecayRunnable(JavaPlugin plugin, Random random, int randomTickSpeed) {
-        this(plugin, random, new ArrayList<>(), randomTickSpeed);
+    public DecayRunnable(NetherTreePlugin plugin, Random random, int randomTickSpeed) {
+        this(plugin, random, new HashMap<>(), randomTickSpeed);
     }
 
-    public DecayRunnable(JavaPlugin plugin, Random random, List<Block> scheduledBlocks, int randomTickSpeed) {
+    public DecayRunnable(NetherTreePlugin plugin, Random random, Map<Long, List<Block>> scheduledBlocks, int randomTickSpeed) {
         this.plugin = plugin;
         this.random = random;
         this.scheduledBlocks = scheduledBlocks;
-        this.base = 43;
-        this.group = 6;
+        this.randomTickSpeed = randomTickSpeed;
     }
 
     @Override
     public void run() {
-        for (Block block : pickSomeScheduledBlocks()) {
-            LeavesDecayEvent event = new LeavesDecayEvent(block);
-            this.plugin.getServer().getPluginManager().callEvent(event);
-            if (!event.isCancelled()) {
-                block.removeMetadata("persistent", this.plugin);
-                block.breakNaturally();
+        if (this.scheduledBlocks.isEmpty()) {
+            this.plugin.unregisterRunnable(this);
+            return;
+        }
+        for (Block block : getSomeScheduledBlocks()) {
+            if (!block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
+                continue;
             }
+            if (NetherTree.LEAVES.contains(block.getType())) {
+                LeavesDecayEvent event = new LeavesDecayEvent(block);
+                this.plugin.getServer().getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    block.removeMetadata("persistent", this.plugin);
+                    block.breakNaturally();
+                }
+            }
+            this.scheduledBlocks.get(block.getChunk().getChunkKey()).remove(block);
         }
     }
 
     public boolean addBlock(Block block) {
-        if (this.scheduledBlocks.contains(block)) {
+        long chunkKey = block.getChunk().getChunkKey();
+        List<Block> actual = this.scheduledBlocks.computeIfAbsent(chunkKey, s -> new ArrayList<>());
+        if (actual.contains(block)) {
             return false;
         }
-        return this.scheduledBlocks.add(block);
+        return actual.add(block);
     }
 
-    private List<Block> pickSomeScheduledBlocks() {
-        if (this.scheduledBlocks.isEmpty()) {
-            return Collections.emptyList();
+     public void removeFromScheduledBlocks(List<Block> blocks) {
+        for (Block block : blocks) {
+            long chunkKey = block.getChunk().getChunkKey();
+            if (scheduledBlocks.containsKey(chunkKey)) {
+                scheduledBlocks.get(chunkKey).remove(block);
+            }
         }
+    }
 
-        int n = (this.scheduledBlocks.size() >> group);
-        if (this.random.nextInt(50) > base) {
-            n += 1;
-        }
+    private List<Block> getSomeScheduledBlocks() {
+        List<Block> blocks = new ArrayList<>();
+        for (Iterator<Map.Entry<Long, List<Block>>> it = this.scheduledBlocks.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, List<Block>> entry = it.next();
+            if (entry.getValue().isEmpty()) {
+                it.remove();
+                continue;
+            }
 
-        List<Block> blocks = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            blocks.add(this.scheduledBlocks.remove(this.random.nextInt(this.scheduledBlocks.size())));
+            List<Block> scheduled = entry.getValue();
+            for (int i = 0; i < this.randomTickSpeed; i++) {
+                int n = this.random.nextInt(455);
+                if (n < scheduled.size()) {
+                    blocks.add(scheduled.get(n));
+                }
+            }
         }
         return blocks;
     }

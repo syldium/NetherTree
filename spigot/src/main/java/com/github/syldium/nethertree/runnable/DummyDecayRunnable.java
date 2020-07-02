@@ -1,15 +1,15 @@
 package com.github.syldium.nethertree.runnable;
 
+import com.github.syldium.nethertree.NetherTreePlugin;
 import org.bukkit.block.Block;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class DummyDecayRunnable extends DecayRunnable {
 
-    public DummyDecayRunnable(JavaPlugin plugin) {
-        super(plugin, new Random(), new ArrayList<>(0), 0);
+    public DummyDecayRunnable(NetherTreePlugin plugin) {
+        super(plugin, new Random(), new HashMap<>(0), 0);
     }
 
     @Override

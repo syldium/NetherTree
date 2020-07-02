@@ -10,6 +10,8 @@ out/
 
 # Compiled class file
 *.class
+build/
+run/
 target/
 
 # Log file
@@ -29,6 +31,9 @@ target/
 *.zip
 *.tar.gz
 *.rar
+
+# Gradle
+.gradle/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
