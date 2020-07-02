@@ -2,6 +2,7 @@ package com.github.syldium.nethertree.runnable;
 
 import com.github.syldium.nethertree.NetherTreePlugin;
 import com.github.syldium.nethertree.util.NetherTree;
+import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -49,12 +50,12 @@ public class DecayRunnable extends BukkitRunnable {
                     block.breakNaturally();
                 }
             }
-            this.scheduledBlocks.get(block.getChunk().getChunkKey()).remove(block);
+            this.scheduledBlocks.get(getChunkKey(block.getChunk())).remove(block);
         }
     }
 
     public boolean addBlock(Block block) {
-        long chunkKey = block.getChunk().getChunkKey();
+        long chunkKey = getChunkKey(block.getChunk());
         List<Block> actual = this.scheduledBlocks.computeIfAbsent(chunkKey, s -> new ArrayList<>());
         if (actual.contains(block)) {
             return false;
@@ -64,7 +65,7 @@ public class DecayRunnable extends BukkitRunnable {
 
      public void removeFromScheduledBlocks(List<Block> blocks) {
         for (Block block : blocks) {
-            long chunkKey = block.getChunk().getChunkKey();
+            long chunkKey = getChunkKey(block.getChunk());
             if (scheduledBlocks.containsKey(chunkKey)) {
                 scheduledBlocks.get(chunkKey).remove(block);
             }
@@ -89,5 +90,9 @@ public class DecayRunnable extends BukkitRunnable {
             }
         }
         return blocks;
+    }
+
+    private long getChunkKey(Chunk chunk) {
+        return (long)chunk.getX() & 4294967295L | ((long)chunk.getZ() & 4294967295L) << 32;
     }
 }
