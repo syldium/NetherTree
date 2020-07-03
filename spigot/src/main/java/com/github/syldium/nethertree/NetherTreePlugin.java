@@ -4,8 +4,10 @@ import com.github.syldium.nethertree.listener.BlockListener;
 import com.github.syldium.nethertree.listener.StructureGrowListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
 import com.github.syldium.nethertree.runnable.DummyDecayRunnable;
+import com.github.syldium.nethertree.util.RunnableHelper;
 import org.bukkit.GameRule;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -27,11 +29,20 @@ public final class NetherTreePlugin extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new StructureGrowListener(this), this);
 
         this.getConfig().addDefault("generation.set-non-persistent-tag", true);
+
+        ConfigurationSection runnables = this.getConfig().getConfigurationSection("runnables");
+        if (runnables != null) {
+            RunnableHelper.loadFromSection(this, runnables);
+        }
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        for (Map.Entry<UUID, DecayRunnable> entry : this.runnables.entrySet()) {
+            this.getConfig().set("runnables." + entry.getKey().toString(), entry.getValue().serialize());
+        }
+        this.saveConfig();
     }
 
     public DecayRunnable getRunnable(World world) {

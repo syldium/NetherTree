@@ -2,30 +2,33 @@ package com.github.syldium.nethertree.runnable;
 
 import com.github.syldium.nethertree.NetherTreePlugin;
 import com.github.syldium.nethertree.util.NetherTree;
-import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class DecayRunnable extends BukkitRunnable {
 
     private final NetherTreePlugin plugin;
     private final Random random;
-    private final Map<Long, List<Block>> scheduledBlocks;
+    private final Map<Long, List<Location>> scheduledBlocks;
     private final int randomTickSpeed;
 
     public DecayRunnable(NetherTreePlugin plugin, Random random, int randomTickSpeed) {
         this(plugin, random, new HashMap<>(), randomTickSpeed);
     }
 
-    public DecayRunnable(NetherTreePlugin plugin, Random random, Map<Long, List<Block>> scheduledBlocks, int randomTickSpeed) {
+    public DecayRunnable(NetherTreePlugin plugin, Random random, Map<Long, List<Location>> scheduledBlocks, int randomTickSpeed) {
         this.plugin = plugin;
         this.random = random;
         this.scheduledBlocks = scheduledBlocks;
@@ -38,10 +41,13 @@ public class DecayRunnable extends BukkitRunnable {
             this.plugin.unregisterRunnable(this);
             return;
         }
-        for (Block block : getSomeScheduledBlocks()) {
-            if (!block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
+
+        for (Location loc : getSomeScheduledLocations()) {
+            if (!Objects.requireNonNull(loc.getWorld()).isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
                 continue;
             }
+
+            Block block = loc.getBlock();
             if (NetherTree.LEAVES.contains(block.getType())) {
                 LeavesDecayEvent event = new LeavesDecayEvent(block);
                 this.plugin.getServer().getPluginManager().callEvent(event);
@@ -50,38 +56,54 @@ public class DecayRunnable extends BukkitRunnable {
                     block.breakNaturally();
                 }
             }
-            this.scheduledBlocks.get(getChunkKey(block.getChunk())).remove(block);
+            this.scheduledBlocks.get(getChunkKey(block.getLocation())).remove(loc);
         }
     }
 
     public boolean addBlock(Block block) {
-        long chunkKey = getChunkKey(block.getChunk());
-        List<Block> actual = this.scheduledBlocks.computeIfAbsent(chunkKey, s -> new ArrayList<>());
-        if (actual.contains(block)) {
+        return this.addLocation(block.getLocation());
+    }
+
+    public boolean addLocation(Location loc) {
+        long chunkKey = getChunkKey(loc);
+        List<Location> actual = this.scheduledBlocks.computeIfAbsent(chunkKey, s -> new ArrayList<>());
+        if (actual.contains(loc)) {
             return false;
         }
-        return actual.add(block);
+        return actual.add(loc);
+    }
+
+    public void addBlocks(Collection<Block> blocks) {
+        for (Block block : blocks) {
+            this.addBlock(block);
+        }
+    }
+
+    public void addLocations(Collection<Location> locations) {
+        for (Location loc : locations) {
+            this.addLocation(loc);
+        }
     }
 
      public void removeFromScheduledBlocks(List<Block> blocks) {
         for (Block block : blocks) {
-            long chunkKey = getChunkKey(block.getChunk());
+            long chunkKey = getChunkKey(block.getLocation());
             if (scheduledBlocks.containsKey(chunkKey)) {
-                scheduledBlocks.get(chunkKey).remove(block);
+                scheduledBlocks.get(chunkKey).remove(block.getLocation());
             }
         }
     }
 
-    private List<Block> getSomeScheduledBlocks() {
-        List<Block> blocks = new ArrayList<>();
-        for (Iterator<Map.Entry<Long, List<Block>>> it = this.scheduledBlocks.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Long, List<Block>> entry = it.next();
+    private List<Location> getSomeScheduledLocations() {
+        List<Location> blocks = new ArrayList<>();
+        for (Iterator<Map.Entry<Long, List<Location>>> it = this.scheduledBlocks.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, List<Location>> entry = it.next();
             if (entry.getValue().isEmpty()) {
                 it.remove();
                 continue;
             }
 
-            List<Block> scheduled = entry.getValue();
+            List<Location> scheduled = entry.getValue();
             for (int i = 0; i < this.randomTickSpeed; i++) {
                 int n = this.random.nextInt(455);
                 if (n < scheduled.size()) {
@@ -92,7 +114,29 @@ public class DecayRunnable extends BukkitRunnable {
         return blocks;
     }
 
-    private long getChunkKey(Chunk chunk) {
-        return (long)chunk.getX() & 4294967295L | ((long)chunk.getZ() & 4294967295L) << 32;
+    private long getChunkKey(Location location) {
+        return (long) location.getBlockX() & 0xffffffffL | ((long) location.getBlockZ() & 0xffffffffL) << 32;
+    }
+
+    public List<String> serialize() {
+        List<String> locations = new ArrayList<>();
+        for (List<Location> scheduled : this.scheduledBlocks.values()) {
+            for (Location loc : scheduled) {
+                locations.add(String.format("%d:%d:%d", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+            }
+        }
+        return locations;
+    }
+
+    public void deserialize(NetherTreePlugin plugin, List<String> sections, World world) {
+        for (String serialized : sections) {
+            String[] split = serialized.split(":");
+            try {
+                Location location = new Location(world, Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+                this.addLocation(location);
+            } catch (ArrayIndexOutOfBoundsException|NumberFormatException e) {
+                plugin.getLogger().severe("Invalid config: " + e.getMessage());
+            }
+        }
     }
 }
