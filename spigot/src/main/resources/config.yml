@@ -1,1 +1,13 @@
+drop:
+  base:
+    NETHER_WART_BLOCK: 40
+    WARPED_WART_BLOCK: 40
+    SHROOMLIGHT: 60
+  player:
+    NETHER_WART_BLOCK: 70
+    WARPED_WART_BLOCK: 70
+    SHROOMLIGHT: 90
+  always-drop-when-hoe-used: true
+  tnt-use-players-rate: true
+
 max-distance-from-log: 5

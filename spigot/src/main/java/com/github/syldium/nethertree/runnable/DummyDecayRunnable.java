@@ -1,7 +1,7 @@
 package com.github.syldium.nethertree.runnable;
 
 import com.github.syldium.nethertree.NetherTreePlugin;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -13,7 +13,7 @@ public class DummyDecayRunnable extends DecayRunnable {
     }
 
     @Override
-    public boolean addBlock(Block block) {
+    public boolean addLocation(Location location) {
         return true;
     }
 }

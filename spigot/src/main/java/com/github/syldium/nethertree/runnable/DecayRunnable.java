@@ -3,6 +3,7 @@ package com.github.syldium.nethertree.runnable;
 import com.github.syldium.nethertree.NetherTreePlugin;
 import com.github.syldium.nethertree.util.NetherTree;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -53,7 +54,11 @@ public class DecayRunnable extends BukkitRunnable {
                 this.plugin.getServer().getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     block.removeMetadata("persistent", this.plugin);
-                    block.breakNaturally();
+                    if (this.plugin.getDropCalculator().shouldDrop(block, null)) {
+                        block.breakNaturally();
+                    } else {
+                        block.setType(Material.AIR);
+                    }
                 }
             }
             this.scheduledBlocks.get(getChunkKey(block.getLocation())).remove(loc);

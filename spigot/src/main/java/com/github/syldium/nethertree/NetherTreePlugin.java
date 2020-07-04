@@ -1,5 +1,6 @@
 package com.github.syldium.nethertree;
 
+import com.github.syldium.nethertree.handler.DropCalculator;
 import com.github.syldium.nethertree.listener.BlockPlaceListener;
 import com.github.syldium.nethertree.listener.BlockRemoveListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public final class NetherTreePlugin extends JavaPlugin {
 
     private final Map<UUID, DecayRunnable> runnables = new HashMap<>();
+    private DropCalculator dropCalculator;
 
     @Override
     public void onEnable() {
@@ -70,5 +72,10 @@ public final class NetherTreePlugin extends JavaPlugin {
     private void loadConfig() {
         this.saveDefaultConfig();
         this.getConfig().addDefault("max-distance-from-log", 5);
+        this.dropCalculator = new DropCalculator(this.getConfig().getConfigurationSection("drop"));
+    }
+
+    public DropCalculator getDropCalculator() {
+        return Objects.requireNonNull(dropCalculator, "drop calculator");
     }
 }
