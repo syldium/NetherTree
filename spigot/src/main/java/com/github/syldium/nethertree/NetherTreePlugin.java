@@ -1,7 +1,7 @@
 package com.github.syldium.nethertree;
 
-import com.github.syldium.nethertree.listener.BlockListener;
-import com.github.syldium.nethertree.listener.StructureGrowListener;
+import com.github.syldium.nethertree.listener.BlockPlaceListener;
+import com.github.syldium.nethertree.listener.BlockRemoveListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
 import com.github.syldium.nethertree.runnable.DummyDecayRunnable;
 import com.github.syldium.nethertree.util.RunnableHelper;
@@ -24,11 +24,9 @@ public final class NetherTreePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        this.saveDefaultConfig();
-        this.getServer().getPluginManager().registerEvents(new BlockListener(this), this);
-        this.getServer().getPluginManager().registerEvents(new StructureGrowListener(this), this);
-
-        this.getConfig().addDefault("generation.set-non-persistent-tag", true);
+        this.loadConfig();
+        this.getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new BlockRemoveListener(this), this);
 
         ConfigurationSection runnables = this.getConfig().getConfigurationSection("runnables");
         if (runnables != null) {
@@ -67,5 +65,10 @@ public final class NetherTreePlugin extends JavaPlugin {
                 this.runnables.remove(uuid);
             }
         }
+    }
+
+    private void loadConfig() {
+        this.saveDefaultConfig();
+        this.getConfig().addDefault("max-distance-from-log", 5);
     }
 }

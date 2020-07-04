@@ -1,2 +1,1 @@
-generation:
-    set-non-persistent-tag: true
+max-distance-from-log: 5

@@ -85,13 +85,12 @@ public class DecayRunnable extends BukkitRunnable {
         }
     }
 
-     public void removeFromScheduledBlocks(List<Block> blocks) {
-        for (Block block : blocks) {
-            long chunkKey = getChunkKey(block.getLocation());
-            if (scheduledBlocks.containsKey(chunkKey)) {
-                scheduledBlocks.get(chunkKey).remove(block.getLocation());
-            }
+     public boolean removeFromScheduledBlocks(Block block) {
+        long chunkKey = getChunkKey(block.getLocation());
+        if (this.scheduledBlocks.containsKey(chunkKey)) {
+            return this.scheduledBlocks.get(chunkKey).remove(block.getLocation());
         }
+        return false;
     }
 
     private List<Location> getSomeScheduledLocations() {
