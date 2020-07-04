@@ -1,8 +1,10 @@
 package com.github.syldium.nethertree;
 
 import com.github.syldium.nethertree.handler.DropCalculator;
+import com.github.syldium.nethertree.handler.TreeHandler;
 import com.github.syldium.nethertree.listener.BlockPlaceListener;
 import com.github.syldium.nethertree.listener.BlockRemoveListener;
+import com.github.syldium.nethertree.listener.ChunkUnloadListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
 import com.github.syldium.nethertree.runnable.DummyDecayRunnable;
 import com.github.syldium.nethertree.util.RunnableHelper;
@@ -22,11 +24,14 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     private final Map<UUID, DecayRunnable> runnables = new HashMap<>();
     private DropCalculator dropCalculator;
+    private TreeHandler treeHandler;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         this.loadConfig();
+        this.treeHandler = new TreeHandler(this);
+        this.getServer().getPluginManager().registerEvents(new ChunkUnloadListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockRemoveListener(this), this);
 
@@ -77,5 +82,9 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     public DropCalculator getDropCalculator() {
         return Objects.requireNonNull(dropCalculator, "drop calculator");
+    }
+
+    public TreeHandler getTreeHandler() {
+        return treeHandler;
     }
 }

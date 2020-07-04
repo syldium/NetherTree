@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
+import static com.github.syldium.nethertree.util.ChunkKey.getChunkKey;
+
 public class DecayRunnable extends BukkitRunnable {
 
     private final NetherTreePlugin plugin;
@@ -116,10 +118,6 @@ public class DecayRunnable extends BukkitRunnable {
             }
         }
         return blocks;
-    }
-
-    private long getChunkKey(Location location) {
-        return (long) location.getBlockX() & 0xffffffffL | ((long) location.getBlockZ() & 0xffffffffL) << 32;
     }
 
     public List<String> serialize() {

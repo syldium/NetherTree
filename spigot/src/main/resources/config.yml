@@ -10,4 +10,4 @@ drop:
   always-drop-when-hoe-used: true
   tnt-use-players-rate: true
 
-max-distance-from-log: 5
+max-distance-from-log: 4
