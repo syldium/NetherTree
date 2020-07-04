@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.Collections;
 import java.util.Objects;
 
 public class BlockPlaceListener implements Listener {
@@ -27,11 +26,7 @@ public class BlockPlaceListener implements Listener {
             event.getBlock().getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true));
         } else if (NetherTree.LOGS.contains(event.getBlock().getType())) {
             int maxDistance = this.plugin.getConfig().getInt("max-distance-from-log");
-            for (Block block : NetherTree.getNearbyBlocks(event.getBlock().getLocation(), maxDistance, Collections.emptyList())) {
-                if (!NetherTree.LEAVES.contains(block.getType())) {
-                    continue;
-                }
-
+            for (Block block : NetherTree.getNearbyBlocks(event.getBlock().getLocation(), maxDistance, NetherTree.LEAVES)) {
                 boolean removed = this.plugin.getRunnable(event.getBlock().getWorld()).removeFromScheduledBlocks(block);
                 if (!removed) { // If the block was already here, it must be persistent
                     block.getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true));

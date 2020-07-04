@@ -17,7 +17,7 @@ public class NetherTree {
     public static final EnumSet<Material> LOGS = EnumSet.of(Material.CRIMSON_STEM, Material.WARPED_STEM);
     public static final EnumSet<Material> LEAVES = EnumSet.of(Material.NETHER_WART_BLOCK, Material.SHROOMLIGHT, Material.WARPED_WART_BLOCK);
 
-    public static boolean hasLog(List<Location> potentialLogs, List<Location> nothingHere, Block leaves, int maxDistance, int maxDistanceSquared) {
+    public static boolean hasLog(Collection<Location> potentialLogs, Block leaves, int maxDistance, int maxDistanceSquared) {
         // Search among already known logs
         for (Location knownLog : potentialLogs) {
             double distance = NumberConversions.square(knownLog.getX() - leaves.getX()) + NumberConversions.square(knownLog.getY() - leaves.getY()) + NumberConversions.square(knownLog.getZ() - leaves.getZ());
@@ -27,26 +27,25 @@ public class NetherTree {
         }
 
         // Otherwise search among the nearby blocks
-        for (Block block : getNearbyBlocks(leaves.getLocation(), maxDistance, nothingHere)) {
-            if (LOGS.contains(block.getType())) {
-                potentialLogs.add(block.getLocation());
-                return true;
-            }
-            nothingHere.add(block.getLocation());
+        Block block = getNearbyBlock(leaves.getLocation(), maxDistance, LOGS);
+        if (block != null) {
+            potentialLogs.add(block.getLocation());
         }
-        return false;
+        return block != null;
     }
 
-    public static List<Block> getNearbyBlocks(Location location, int radius, Collection<Location> ignore) {
+    public static List<Block> getNearbyBlocks(Location location, int radius, EnumSet<Material> type) {
         World world = location.getWorld();
         Objects.requireNonNull(world, "World cannot be null");
 
-        List<Block> blocks = new ArrayList<>();
+        int layer = (radius * 2) + 1;
+        List<Block> blocks = new ArrayList<>(layer * layer * layer);
         for (double x = location.getX() - radius; x <= location.getX() + radius; x++) {
             for (double y = location.getY() - radius; y <= location.getY() + radius; y++) {
                 for (double z = location.getZ() - radius; z <= location.getZ() + radius; z++) {
-                    if (notContains((int) x, (int) y, (int) z, ignore)) {
-                        blocks.add(world.getBlockAt((int) x, (int) y, (int) z));
+                    Block block = world.getBlockAt((int) x, (int) y, (int) z);
+                    if (type.contains(block.getType())) {
+                        blocks.add(block);
                     }
                 }
             }
@@ -54,13 +53,20 @@ public class NetherTree {
         return blocks;
     }
 
-    private static boolean notContains(int x, int y, int z, Collection<Location> ignore) {
-        // Custom .contains() - Compare only coordinates
-        for (Location location : ignore) {
-            if (location.getBlockX() == x && location.getBlockY() == y && location.getBlockZ() == z) {
-                return false;
+    public static Block getNearbyBlock(Location location, int radius, EnumSet<Material> type) {
+        World world = location.getWorld();
+        Objects.requireNonNull(world, "World cannot be null");
+
+        for (double x = location.getX() - radius; x <= location.getX() + radius; x++) {
+            for (double y = location.getY() - radius; y <= location.getY() + radius; y++) {
+                for (double z = location.getZ() - radius; z <= location.getZ() + radius; z++) {
+                    Block block = world.getBlockAt((int) x, (int) y, (int) z);
+                    if (type.contains(block.getType())) {
+                        return block;
+                    }
+                }
             }
         }
-        return true;
+        return null;
     }
 }

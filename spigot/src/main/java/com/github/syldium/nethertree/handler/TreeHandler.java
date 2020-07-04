@@ -30,16 +30,13 @@ public class TreeHandler {
         this.maxDistanceSquared = (int) NumberConversions.square(this.maxDistance);
     }
 
+    public void removeLog(Block removed) {
+        getPotentialLogs(removed.getLocation()).removeIf(loc -> loc.getBlockX() == removed.getX() && loc.getBlockY() == removed.getY() && loc.getBlockZ() == removed.getZ());
+    }
+
     public void handleLogRemove(Block removed) {
-        List<Location> potentialLogs = this.cache.computeIfAbsent(getChunkKey(removed.getLocation()), s -> new ArrayList<>());
-        potentialLogs.removeIf(loc -> loc.getBlockX() == removed.getX() && loc.getBlockY() == removed.getY() && loc.getBlockZ() == removed.getZ());
-
-        List<Location> nothingHere = new ArrayList<>();
-        for (Block block : NetherTree.getNearbyBlocks(removed.getLocation(), this.maxDistance, nothingHere)) {
-            if (!NetherTree.LEAVES.contains(block.getType())) {
-                continue;
-            }
-
+        List<Location> potentialLogs = getPotentialLogs(removed.getLocation());
+        for (Block block : NetherTree.getNearbyBlocks(removed.getLocation(), this.maxDistance, NetherTree.LEAVES)) {
             boolean persistent = false;
             for (MetadataValue metadataValue : block.getState().getMetadata("persistent")) {
                 persistent = metadataValue.asBoolean();
@@ -48,7 +45,7 @@ public class TreeHandler {
                 continue;
             }
 
-            if (!NetherTree.hasLog(potentialLogs, nothingHere, block, this.maxDistance, this.maxDistanceSquared)) {
+            if (!NetherTree.hasLog(potentialLogs, block, this.maxDistance, this.maxDistanceSquared)) {
                 this.plugin.getRunnable(block.getWorld()).addBlock(block);
             }
         }
@@ -58,6 +55,10 @@ public class TreeHandler {
 
     public void invalidate(long chunkKey) {
         this.cache.remove(chunkKey);
+    }
+
+    private List<Location> getPotentialLogs(Location location) {
+        return this.cache.computeIfAbsent(getChunkKey(location), s -> new ArrayList<>());
     }
 
     private void clearCacheIfNeeded() {
