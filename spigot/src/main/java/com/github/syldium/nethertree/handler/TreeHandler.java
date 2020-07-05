@@ -1,17 +1,18 @@
 package com.github.syldium.nethertree.handler;
 
 import com.github.syldium.nethertree.NetherTreePlugin;
+import com.github.syldium.nethertree.util.BlockHelper;
 import com.github.syldium.nethertree.util.NetherTree;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.util.NumberConversions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.github.syldium.nethertree.util.ChunkKey.getChunkKey;
 
@@ -19,7 +20,7 @@ public class TreeHandler {
 
     private final NetherTreePlugin plugin;
 
-    private final Map<Long, List<Location>> cache = new HashMap<>();
+    private final Map<Long, Set<Location>> cache = new HashMap<>();
     private final int maxDistance;
     private final int maxDistanceSquared;
 
@@ -27,7 +28,7 @@ public class TreeHandler {
         Objects.requireNonNull(plugin, "plugin");
         this.plugin = plugin;
         this.maxDistance = plugin.getConfig().getInt("max-distance-from-log", 4);
-        this.maxDistanceSquared = (int) NumberConversions.square(this.maxDistance);
+        this.maxDistanceSquared = this.maxDistance * (this.maxDistance + 1); // For diagonals
     }
 
     public void removeLog(Block removed) {
@@ -35,10 +36,10 @@ public class TreeHandler {
     }
 
     public void handleLogRemove(Block removed) {
-        List<Location> potentialLogs = getPotentialLogs(removed.getLocation());
-        for (Block block : NetherTree.getNearbyBlocks(removed.getLocation(), this.maxDistance, NetherTree.LEAVES)) {
+        Set<Location> potentialLogs = getPotentialLogs(removed.getLocation());
+        for (Block block : this.getLeavesNearTo(removed)) {
             boolean persistent = false;
-            for (MetadataValue metadataValue : block.getState().getMetadata("persistent")) {
+            for (MetadataValue metadataValue : block.getMetadata("persistent")) {
                 persistent = metadataValue.asBoolean();
             }
             if (persistent) {
@@ -53,12 +54,16 @@ public class TreeHandler {
         this.clearCacheIfNeeded();
     }
 
+    public List<Block> getLeavesNearTo(Block block) {
+        return BlockHelper.getNearbyBlocksByType(block.getLocation(), this.maxDistance, this.maxDistanceSquared, NetherTree.LEAVES);
+    }
+
     public void invalidate(long chunkKey) {
         this.cache.remove(chunkKey);
     }
 
-    private List<Location> getPotentialLogs(Location location) {
-        return this.cache.computeIfAbsent(getChunkKey(location), s -> new ArrayList<>());
+    private Set<Location> getPotentialLogs(Location location) {
+        return this.cache.computeIfAbsent(getChunkKey(location), s -> new HashSet<>());
     }
 
     private void clearCacheIfNeeded() {
