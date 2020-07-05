@@ -1,5 +1,5 @@
 drop:
-  base:
+  base: # Default drop rates
     NETHER_WART_BLOCK: 40
     WARPED_WART_BLOCK: 40
     SHROOMLIGHT: 60
@@ -7,7 +7,11 @@ drop:
     NETHER_WART_BLOCK: 70
     WARPED_WART_BLOCK: 70
     SHROOMLIGHT: 90
+
+  # The hoe is the most efficient tool for breaking organic blocks since 1.16.
   always-drop-when-hoe-used: true
+  # TNT explosions have a 100% drop rate since 1.14. At true, a block destroyed by a TNT will use the players' rates.
   tnt-use-players-rate: true
 
-max-distance-from-log: 4
+# Defines the distance to be evaluated from the stem for decaying leaves.
+max-distance-from-stem: 4

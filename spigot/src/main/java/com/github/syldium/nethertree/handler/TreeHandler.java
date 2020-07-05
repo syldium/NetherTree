@@ -27,7 +27,7 @@ public class TreeHandler {
     public TreeHandler(NetherTreePlugin plugin) {
         Objects.requireNonNull(plugin, "plugin");
         this.plugin = plugin;
-        this.maxDistance = plugin.getConfig().getInt("max-distance-from-log", 4);
+        this.maxDistance = plugin.getConfig().getInt("max-distance-from-stem", 4);
         this.maxDistanceSquared = this.maxDistance * (this.maxDistance + 1); // For diagonals
     }
 
