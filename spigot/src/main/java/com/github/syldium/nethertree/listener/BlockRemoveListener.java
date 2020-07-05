@@ -27,10 +27,11 @@ public class BlockRemoveListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onLogBreak(BlockBreakEvent event) {
         if (NetherTree.LOGS.contains(event.getBlock().getType())) {
-            this.plugin.getTreeHandler().removeLog(event.getBlock());
-            this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleLogRemove(event.getBlock()), 2L);
+            this.plugin.getTreeHandler().removeStem(event.getBlock());
+            this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleStemRemove(event.getBlock()), 2L);
         } else if (NetherTree.LEAVES.contains(event.getBlock().getType())) {
             event.setDropItems(this.plugin.getDropCalculator().shouldDrop(event.getBlock(), event.getPlayer()));
+            event.getBlock().removeMetadata("persistent", this.plugin);
         }
     }
 
@@ -47,9 +48,10 @@ public class BlockRemoveListener implements Listener {
     private void handleExplosion(List<Block> removed, Entity cause) {
         for (Block block : removed) {
             if (NetherTree.LOGS.contains(block.getType())) {
-                this.plugin.getTreeHandler().removeLog(block);
-                this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleLogRemove(block), 2L);
+                this.plugin.getTreeHandler().removeStem(block);
+                this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleStemRemove(block), 2L);
             } else if (NetherTree.LEAVES.contains(block.getType())) {
+                block.removeMetadata("persistent", this.plugin);
                 if (!this.plugin.getDropCalculator().shouldDrop(block, cause)) {
                     block.setType(Material.AIR);
                 }

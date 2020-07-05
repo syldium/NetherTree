@@ -25,12 +25,7 @@ public class BlockPlaceListener implements Listener {
         if (NetherTree.LEAVES.contains(event.getBlock().getType())) {
             event.getBlock().getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true));
         } else if (NetherTree.LOGS.contains(event.getBlock().getType())) {
-            for (Block block : this.plugin.getTreeHandler().getLeavesNearTo(event.getBlock())) {
-                boolean removed = this.plugin.getRunnable(event.getBlock().getWorld()).removeFromScheduledBlocks(block);
-                if (!removed) { // If the block was already here, it must be persistent
-                    block.getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true));
-                }
-            }
+            this.plugin.getTreeHandler().handleStemPlace(event.getBlock());
         }
     }
 }
