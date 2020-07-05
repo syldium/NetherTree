@@ -2,7 +2,6 @@ package com.github.syldium.nethertree.listener;
 
 import com.github.syldium.nethertree.NetherTreePlugin;
 import com.github.syldium.nethertree.util.NetherTree;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
