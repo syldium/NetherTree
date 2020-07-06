@@ -4,3 +4,5 @@ main: com.github.syldium.nethertree.NetherTreePlugin
 api-version: 1.16
 authors: [syldium]
 description: Decays the leaves of the Fungi trees (Nether trees)
+softdepend: [WorldGuard]
+website: https://github.com/syldium/NetherTree

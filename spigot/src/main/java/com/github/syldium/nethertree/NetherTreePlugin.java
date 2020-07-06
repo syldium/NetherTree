@@ -2,6 +2,7 @@ package com.github.syldium.nethertree;
 
 import com.github.syldium.nethertree.handler.DropCalculator;
 import com.github.syldium.nethertree.handler.TreeHandler;
+import com.github.syldium.nethertree.hook.HookManager;
 import com.github.syldium.nethertree.listener.BlockPlaceListener;
 import com.github.syldium.nethertree.listener.BlockRemoveListener;
 import com.github.syldium.nethertree.listener.ChunkUnloadListener;
@@ -15,6 +16,7 @@ import java.util.Objects;
 public final class NetherTreePlugin extends JavaPlugin {
 
     private DropCalculator dropCalculator;
+    private HookManager hookManager;
     private RunnablesManager runnablesManager;
     private TreeHandler treeHandler;
 
@@ -29,6 +31,9 @@ public final class NetherTreePlugin extends JavaPlugin {
 
         this.runnablesManager = new RunnablesManager(this);
         this.runnablesManager.load();
+
+        this.hookManager = new HookManager();
+        this.hookManager.registerHook(this.getServer().getPluginManager().getPlugin("WorldGuard"));
     }
 
     @Override
@@ -53,6 +58,10 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     public DropCalculator getDropCalculator() {
         return Objects.requireNonNull(dropCalculator, "drop calculator");
+    }
+
+    public HookManager getHookManager() {
+        return Objects.requireNonNull(hookManager, "hook manager");
     }
 
     public TreeHandler getTreeHandler() {
