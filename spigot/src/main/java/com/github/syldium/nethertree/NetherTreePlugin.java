@@ -5,7 +5,7 @@ import com.github.syldium.nethertree.handler.TreeHandler;
 import com.github.syldium.nethertree.hook.HookManager;
 import com.github.syldium.nethertree.listener.BlockPlaceListener;
 import com.github.syldium.nethertree.listener.BlockRemoveListener;
-import com.github.syldium.nethertree.listener.ChunkUnloadListener;
+import com.github.syldium.nethertree.listener.WorldListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
 import com.github.syldium.nethertree.runnable.RunnablesManager;
 import org.bukkit.World;
@@ -25,7 +25,7 @@ public final class NetherTreePlugin extends JavaPlugin {
         // Plugin startup logic
         this.loadConfig();
         this.treeHandler = new TreeHandler(this);
-        this.getServer().getPluginManager().registerEvents(new ChunkUnloadListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new WorldListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockRemoveListener(this), this);
 
@@ -57,14 +57,14 @@ public final class NetherTreePlugin extends JavaPlugin {
     }
 
     public DropCalculator getDropCalculator() {
-        return Objects.requireNonNull(dropCalculator, "drop calculator");
+        return Objects.requireNonNull(this.dropCalculator, "drop calculator");
     }
 
     public HookManager getHookManager() {
-        return Objects.requireNonNull(hookManager, "hook manager");
+        return Objects.requireNonNull(this.hookManager, "hook manager");
     }
 
     public TreeHandler getTreeHandler() {
-        return treeHandler;
+        return this.treeHandler;
     }
 }

@@ -23,7 +23,7 @@ public class BlockPlaceListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         if (NetherTree.LEAVES.contains(event.getBlock().getType())) {
             event.getBlock().getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true));
-        } else if (NetherTree.LOGS.contains(event.getBlock().getType())) {
+        } else if (NetherTree.STEMS.contains(event.getBlock().getType())) {
             this.plugin.getTreeHandler().handleStemPlace(event.getBlock());
         }
     }

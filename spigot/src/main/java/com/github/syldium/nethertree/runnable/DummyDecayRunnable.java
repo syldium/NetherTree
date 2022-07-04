@@ -3,17 +3,20 @@ package com.github.syldium.nethertree.runnable;
 import com.github.syldium.nethertree.NetherTreePlugin;
 import org.bukkit.Location;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Random;
 
-public class DummyDecayRunnable extends DecayRunnable {
+/**
+ * A dummy variant of DecayRunnable if randomTickSpeed is set to 0.
+ */
+class DummyDecayRunnable extends DecayRunnable {
 
-    public DummyDecayRunnable(NetherTreePlugin plugin) {
-        super(plugin, new Random(), new HashMap<>(0), 0);
+    DummyDecayRunnable(NetherTreePlugin plugin) {
+        super(plugin, new Random(), Collections.emptyMap(), 0);
     }
 
     @Override
-    public boolean addLocation(Location location) {
+    public boolean addLocation(Location loc) {
         return true;
     }
 }

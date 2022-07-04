@@ -7,17 +7,21 @@ import org.bukkit.util.NumberConversions;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 
 import static com.github.syldium.nethertree.util.BlockHelper.getNearbyBlockByType;
 
 public class NetherTree {
 
-    public static final EnumSet<Material> LOGS = EnumSet.of(Material.CRIMSON_STEM, Material.WARPED_STEM);
-    public static final EnumSet<Material> LEAVES = EnumSet.of(Material.NETHER_WART_BLOCK, Material.SHROOMLIGHT, Material.WARPED_WART_BLOCK);
+    /** Set of all the tree stems */
+    public static final Set<Material> STEMS = EnumSet.of(Material.CRIMSON_STEM, Material.WARPED_STEM);
 
-    public static boolean hasLog(Collection<Location> potentialLogs, Block leaves, int maxDistance, int maxDistanceSquared) {
-        // Search among already known logs
-        for (Location knownLog : potentialLogs) {
+    /** Set of all the tree leaves */
+    public static final Set<Material> LEAVES = EnumSet.of(Material.NETHER_WART_BLOCK, Material.SHROOMLIGHT, Material.WARPED_WART_BLOCK);
+
+    public static boolean hasStem(Collection<Location> potentialStems, Block leaves, int maxDistance, int maxDistanceSquared) {
+        // Search among already known stems
+        for (Location knownLog : potentialStems) {
             double distance = NumberConversions.square(knownLog.getX() - leaves.getX()) + NumberConversions.square(knownLog.getY() - leaves.getY()) + NumberConversions.square(knownLog.getZ() - leaves.getZ());
             if (distance <= maxDistanceSquared) {
                 return true;
@@ -25,9 +29,9 @@ public class NetherTree {
         }
 
         // Otherwise search among the nearby blocks
-        Block block = getNearbyBlockByType(leaves.getLocation(), maxDistance, maxDistanceSquared, LOGS);
+        Block block = getNearbyBlockByType(leaves.getLocation(), maxDistance, maxDistanceSquared, STEMS);
         if (block != null) {
-            potentialLogs.add(block.getLocation());
+            potentialStems.add(block.getLocation());
         }
         return block != null;
     }

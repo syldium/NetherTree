@@ -8,6 +8,9 @@ import org.bukkit.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manage interactions with other plugins.
+ */
 public class HookManager implements ProtectionHook {
 
     private final List<ProtectionHook> hooks = new ArrayList<>();
@@ -18,6 +21,13 @@ public class HookManager implements ProtectionHook {
         }
     }
 
+    /**
+     * Determines whether a block can decay at the given location.
+     *
+     * @param player Original player
+     * @param location Block location
+     * @return If no hooks have objected
+     */
     @Override
     public boolean canDecay(Player player, Location location) {
         for (ProtectionHook hook : this.hooks) {

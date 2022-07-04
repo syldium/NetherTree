@@ -20,6 +20,9 @@ import java.util.Random;
 
 import static com.github.syldium.nethertree.util.ChunkKey.getChunkKey;
 
+/**
+ * This repetitive task is used to manage leaf decay.
+ */
 public class DecayRunnable extends BukkitRunnable {
 
     private final NetherTreePlugin plugin;
@@ -27,11 +30,11 @@ public class DecayRunnable extends BukkitRunnable {
     private final Map<Long, List<Location>> scheduledBlocks;
     private final int randomTickSpeed;
 
-    public DecayRunnable(NetherTreePlugin plugin, Random random, int randomTickSpeed) {
+    DecayRunnable(NetherTreePlugin plugin, Random random, int randomTickSpeed) {
         this(plugin, random, new HashMap<>(), randomTickSpeed);
     }
 
-    public DecayRunnable(NetherTreePlugin plugin, Random random, Map<Long, List<Location>> scheduledBlocks, int randomTickSpeed) {
+    DecayRunnable(NetherTreePlugin plugin, Random random, Map<Long, List<Location>> scheduledBlocks, int randomTickSpeed) {
         this.plugin = plugin;
         this.random = random;
         this.scheduledBlocks = scheduledBlocks;

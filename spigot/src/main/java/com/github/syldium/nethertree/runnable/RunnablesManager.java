@@ -17,6 +17,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+/**
+ * Centralize all runnables.
+ */
 public class RunnablesManager {
 
     private final NetherTreePlugin plugin;
@@ -39,10 +42,16 @@ public class RunnablesManager {
         }
     }
 
+    /**
+     * Get or create the runnable for this world.
+     *
+     * @param world World
+     * @return Scheduled runnable
+     */
     public DecayRunnable getRunnable(World world) {
         Objects.requireNonNull(world, "world");
 
-        return runnables.computeIfAbsent(world.getUID(), (s) -> {
+        return this.runnables.computeIfAbsent(world.getUID(), (s) -> {
             int randomTickSpeed = Optional.ofNullable(world.getGameRuleValue(GameRule.RANDOM_TICK_SPEED)).orElse(3);
             if (randomTickSpeed < 1) {
                 return new DummyDecayRunnable(this.plugin);
@@ -54,6 +63,12 @@ public class RunnablesManager {
         });
     }
 
+    /**
+     * Cancel and remove a runnable.
+     *
+     * @param runnable Runnable instance
+     * @return If it could be cancelled.
+     */
     public boolean unregisterRunnable(DecayRunnable runnable) {
         for (UUID uuid : this.runnables.keySet()) {
             if (this.runnables.get(uuid).equals(runnable)) {
@@ -66,9 +81,7 @@ public class RunnablesManager {
     }
 
     public void load() {
-        getFileConfiguration(true).ifPresent(config -> {
-            this.loadFromSection(config.getValues(false));
-        });
+        getFileConfiguration(true).ifPresent(config -> this.loadFromSection(config.getValues(false)));
     }
 
     public void save() {
@@ -112,7 +125,7 @@ public class RunnablesManager {
 
                 this.getRunnable(world).deserialize(this.plugin, serialized, world);
             } catch (IllegalArgumentException e) {
-                plugin.getLogger().severe("Invalid config: " + e.getMessage());
+                this.plugin.getLogger().severe("Invalid config: " + e.getMessage());
             }
         }
     }

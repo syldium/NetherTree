@@ -17,6 +17,11 @@ import java.util.Set;
 
 import static com.github.syldium.nethertree.util.ChunkKey.getChunkKey;
 
+/**
+ * Handles the different events related to the nether trees.
+ *
+ * This class caches already known stem locations.
+ */
 public class TreeHandler {
 
     private final NetherTreePlugin plugin;
@@ -32,6 +37,11 @@ public class TreeHandler {
         this.maxDistanceSquared = this.maxDistance * (this.maxDistance + 1); // For diagonals
     }
 
+    /**
+     * Notify that a stem block has been broken.
+     *
+     * @param removed Removed stem
+     */
     public void removeStem(Block removed) {
         getPotentialStems(removed.getLocation()).removeIf(loc -> loc.getBlockX() == removed.getX() && loc.getBlockY() == removed.getY() && loc.getBlockZ() == removed.getZ());
     }
@@ -43,7 +53,7 @@ public class TreeHandler {
                 continue;
             }
 
-            if (!NetherTree.hasLog(potentialStems, block, this.maxDistance, this.maxDistanceSquared)) {
+            if (!NetherTree.hasStem(potentialStems, block, this.maxDistance, this.maxDistanceSquared)) {
                 this.plugin.getRunnable(block.getWorld()).addBlock(block);
             }
         }
@@ -60,7 +70,7 @@ public class TreeHandler {
             }
 
             boolean removed = this.plugin.getRunnable(placed.getWorld()).removeFromScheduledBlocks(block);
-            if (!removed && !NetherTree.hasLog(potentialStems, block, this.maxDistance, this.maxDistanceSquared)) {
+            if (!removed && !NetherTree.hasStem(potentialStems, block, this.maxDistance, this.maxDistanceSquared)) {
                 block.getState().setMetadata("persistent", new FixedMetadataValue(this.plugin, true)); // If the block was already here, it must be persistent
             }
         }
@@ -69,7 +79,7 @@ public class TreeHandler {
     }
 
     public List<Block> getLeavesNearTo(Block block) {
-        return BlockHelper.getNearbyBlocksByType(block.getLocation(), this.maxDistance, this.maxDistanceSquared, NetherTree.LEAVES);
+        return BlockHelper.getNearbyBlocksByType(block, this.maxDistance, this.maxDistanceSquared, NetherTree.LEAVES);
     }
 
     public void invalidate(long chunkKey) {

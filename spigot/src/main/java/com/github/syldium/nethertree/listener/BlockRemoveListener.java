@@ -26,7 +26,7 @@ public class BlockRemoveListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void onLogBreak(BlockBreakEvent event) {
-        if (NetherTree.LOGS.contains(event.getBlock().getType())) {
+        if (NetherTree.STEMS.contains(event.getBlock().getType())) {
             if (this.plugin.getHookManager().canDecay(event.getPlayer(), event.getBlock().getLocation())) {
                 this.plugin.getTreeHandler().removeStem(event.getBlock());
                 this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleStemRemove(event.getBlock()), 2L);
@@ -49,7 +49,7 @@ public class BlockRemoveListener implements Listener {
 
     private void handleExplosion(List<Block> removed, Entity cause) {
         for (Block block : removed) {
-            if (NetherTree.LOGS.contains(block.getType())) {
+            if (NetherTree.STEMS.contains(block.getType())) {
                 if (this.plugin.getHookManager().canDecay(null, block.getLocation())) {
                     this.plugin.getTreeHandler().removeStem(block);
                     this.plugin.getServer().getScheduler().runTaskLater(this.plugin, () -> this.plugin.getTreeHandler().handleStemRemove(block), 2L);

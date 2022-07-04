@@ -8,11 +8,11 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.Objects;
 
-public class ChunkUnloadListener implements Listener {
+public class WorldListener implements Listener {
 
     private final NetherTreePlugin plugin;
 
-    public ChunkUnloadListener(NetherTreePlugin plugin) {
+    public WorldListener(NetherTreePlugin plugin) {
         Objects.requireNonNull(plugin, "plugin");
         this.plugin = plugin;
     }

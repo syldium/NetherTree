@@ -3,7 +3,9 @@ package com.github.syldium.nethertree.util;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
-public class ChunkKey {
+public final class ChunkKey {
+
+    private ChunkKey() {}
 
     public static long getChunkKey(Chunk chunk) {
         return getChunkKey(chunk.getX(), chunk.getZ());

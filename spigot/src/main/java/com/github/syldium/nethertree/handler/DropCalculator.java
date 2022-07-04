@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Centralizes all drop calculations.
+ */
 public class DropCalculator {
 
     private static final EnumSet<Material> HOES = EnumSet.of(
@@ -34,6 +37,13 @@ public class DropCalculator {
         }
     }
 
+    /**
+     * Determines if the material should drop.
+     *
+     * @param material Broken material
+     * @param cause Original Entity
+     * @return should it drop ?
+     */
     public boolean shouldDrop(Material material, Entity cause) {
         if (cause instanceof Player && this.alwaysDropWhenHoeUsed && HOES.contains(((Player) cause).getInventory().getItemInMainHand().getType())) {
             return true;
@@ -46,6 +56,13 @@ public class DropCalculator {
         return this.random.nextInt(100) + 1 <= table.get(material);
     }
 
+    /**
+     * Determines if the block should drop.
+     *
+     * @param block Broken block
+     * @param cause Original entity
+     * @return should it drop ?
+     */
     public boolean shouldDrop(Block block, Entity cause) {
         return this.shouldDrop(block.getType(), cause);
     }

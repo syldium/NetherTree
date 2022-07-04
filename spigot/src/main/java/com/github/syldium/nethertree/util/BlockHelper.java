@@ -4,25 +4,28 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
-public class BlockHelper {
+public final class BlockHelper {
 
-    public static List<Block> getNearbyBlocksByType(Location location, int radius, EnumSet<Material> types) {
+    private BlockHelper() {}
+
+    public static List<Block> getNearbyBlocksByType(Block location, int radius, Set<Material> types) {
         return getNearbyBlocksByType(location, radius, radius * radius, types);
     }
 
-    public static List<Block> getNearbyBlocksByType(Location center, int radius, int radiusSquared, EnumSet<Material> types) {
+    public static List<Block> getNearbyBlocksByType(Block center, int radius, int radiusSquared, Set<Material> types) {
         World world = center.getWorld();
         Objects.requireNonNull(world, "World cannot be null");
 
-        int bx = center.getBlockX();
-        int by = center.getBlockY();
-        int bz = center.getBlockZ();
+        int bx = center.getX();
+        int by = center.getY();
+        int bz = center.getZ();
 
         List<Block> blocks = new ArrayList<>();
         for (int x = bx - radius; x <= bx + radius; x++) {
@@ -41,11 +44,11 @@ public class BlockHelper {
         return blocks;
     }
 
-    public static Block getNearbyBlockByType(Location center, int radius, EnumSet<Material> types) {
+    public static @Nullable Block getNearbyBlockByType(Location center, int radius, Set<Material> types) {
         return getNearbyBlockByType(center, radius, radius * radius, types);
     }
 
-    public static Block getNearbyBlockByType(Location center, int radius, int radiusSquared, EnumSet<Material> types) {
+    public static @Nullable Block getNearbyBlockByType(Location center, int radius, int radiusSquared, Set<Material> types) {
         World world = center.getWorld();
         Objects.requireNonNull(world, "World cannot be null");
 
