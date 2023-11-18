@@ -29,6 +29,12 @@ public final class NetherTreePlugin extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockRemoveListener(this), this);
 
+        try {
+            Class.forName("io.papermc.paper.event.world.WorldGameRuleChangeEvent");
+            this.getServer().getPluginManager().registerEvents(new WorldListener.Paper(this), this);
+        } catch (ClassNotFoundException ignored) {
+        }
+
         this.runnablesManager = new RunnablesManager(this);
         this.runnablesManager.load();
 
@@ -48,6 +54,10 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     public boolean unregisterRunnable(DecayRunnable runnable) {
         return this.runnablesManager.unregisterRunnable(runnable);
+    }
+
+    public void updateRunnable(World world) {
+        this.runnablesManager.updateRunnable(world);
     }
 
     private void loadConfig() {

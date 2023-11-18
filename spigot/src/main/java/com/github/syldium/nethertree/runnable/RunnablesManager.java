@@ -52,7 +52,7 @@ public class RunnablesManager {
         Objects.requireNonNull(world, "world");
 
         return this.runnables.computeIfAbsent(world.getUID(), (s) -> {
-            int randomTickSpeed = Optional.ofNullable(world.getGameRuleValue(GameRule.RANDOM_TICK_SPEED)).orElse(3);
+            int randomTickSpeed = getRandomTickSpeed(world);
             if (randomTickSpeed < 1) {
                 return new DummyDecayRunnable(this.plugin);
             }
@@ -78,6 +78,18 @@ public class RunnablesManager {
             }
         }
         return false;
+    }
+
+    public void updateRunnable(World world) {
+        DecayRunnable runnable = this.runnables.get(world.getUID());
+        if (runnable != null) {
+            int randomTickSpeed = getRandomTickSpeed(world);
+            if (randomTickSpeed < 1) {
+                this.unregisterRunnable(runnable);
+            } else {
+                runnable.setRandomTickSpeed(randomTickSpeed);
+            }
+        }
     }
 
     public void load() {
@@ -128,5 +140,9 @@ public class RunnablesManager {
                 this.plugin.getLogger().severe("Invalid config: " + e.getMessage());
             }
         }
+    }
+
+    private static int getRandomTickSpeed(World world) {
+        return Optional.ofNullable(world.getGameRuleValue(GameRule.RANDOM_TICK_SPEED)).orElse(3);
     }
 }

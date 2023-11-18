@@ -28,7 +28,7 @@ public class DecayRunnable extends BukkitRunnable {
     private final NetherTreePlugin plugin;
     private final Random random;
     private final Map<Long, List<Location>> scheduledBlocks;
-    private final int randomTickSpeed;
+    private int randomTickSpeed;
 
     DecayRunnable(NetherTreePlugin plugin, Random random, int randomTickSpeed) {
         this(plugin, random, new HashMap<>(), randomTickSpeed);
@@ -68,6 +68,10 @@ public class DecayRunnable extends BukkitRunnable {
             }
             this.scheduledBlocks.get(getChunkKey(block.getLocation())).remove(loc);
         }
+    }
+
+    public void setRandomTickSpeed(int randomTickSpeed) {
+        this.randomTickSpeed = randomTickSpeed;
     }
 
     public boolean addBlock(Block block) {
