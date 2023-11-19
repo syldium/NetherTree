@@ -9,17 +9,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public final class BlockHelper {
 
     private BlockHelper() {}
 
-    public static List<Block> getNearbyBlocksByType(Block location, int radius, Set<Material> types) {
+    public static List<Block> getNearbyBlocksByType(Block location, int radius, List<Material> types) {
         return getNearbyBlocksByType(location, radius, radius * radius, types);
     }
 
-    public static List<Block> getNearbyBlocksByType(Block center, int radius, int radiusSquared, Set<Material> types) {
+    public static List<Block> getNearbyBlocksByType(Block center, int radius, int radiusSquared, List<Material> types) {
         World world = center.getWorld();
         Objects.requireNonNull(world, "World cannot be null");
 
@@ -44,11 +43,11 @@ public final class BlockHelper {
         return blocks;
     }
 
-    public static @Nullable Block getNearbyBlockByType(Location center, int radius, Set<Material> types) {
+    public static @Nullable Block getNearbyBlockByType(Location center, int radius, List<Material> types) {
         return getNearbyBlockByType(center, radius, radius * radius, types);
     }
 
-    public static @Nullable Block getNearbyBlockByType(Location center, int radius, int radiusSquared, Set<Material> types) {
+    public static @Nullable Block getNearbyBlockByType(Location center, int radius, int radiusSquared, List<Material> types) {
         World world = center.getWorld();
         Objects.requireNonNull(world, "World cannot be null");
 

@@ -8,8 +8,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 
-import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -18,7 +19,7 @@ import java.util.Random;
  */
 public class DropCalculator {
 
-    private static final EnumSet<Material> HOES = EnumSet.of(
+    private static final List<Material> HOES = Arrays.asList(
             Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.GOLDEN_HOE
     );
 
