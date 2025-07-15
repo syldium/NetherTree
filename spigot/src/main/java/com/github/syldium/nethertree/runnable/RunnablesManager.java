@@ -22,10 +22,13 @@ import java.util.UUID;
  */
 public class RunnablesManager {
 
+    private static final int FOLLOW_WORLD_RANDOM_TICK_SPEED = -1;
+
     private final NetherTreePlugin plugin;
 
     private final File fileConfig;
     private final Map<UUID, DecayRunnable> runnables = new HashMap<>();
+    private int fixedRandomTickSpeed = FOLLOW_WORLD_RANDOM_TICK_SPEED;
 
     public RunnablesManager(NetherTreePlugin plugin) {
         Objects.requireNonNull(plugin, "plugin");
@@ -39,6 +42,12 @@ public class RunnablesManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        Object fixedRandomTickSpeed = plugin.getConfig().get("decay-speed");
+        if (fixedRandomTickSpeed instanceof Integer && (Integer) fixedRandomTickSpeed >= 0) {
+            this.fixedRandomTickSpeed = (Integer) fixedRandomTickSpeed;
+        } else if (fixedRandomTickSpeed != null && !"random-tick-speed".equals(fixedRandomTickSpeed)) {
+            plugin.getLogger().warning("Invalid decay-speed, using the world's random tick speed instead.");
         }
     }
 
@@ -142,7 +151,10 @@ public class RunnablesManager {
         }
     }
 
-    private static int getRandomTickSpeed(World world) {
+    private int getRandomTickSpeed(World world) {
+        if (this.fixedRandomTickSpeed != FOLLOW_WORLD_RANDOM_TICK_SPEED) {
+            return this.fixedRandomTickSpeed;
+        }
         return Optional.ofNullable(world.getGameRuleValue(GameRule.RANDOM_TICK_SPEED)).orElse(3);
     }
 }

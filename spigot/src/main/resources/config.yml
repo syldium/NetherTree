@@ -15,3 +15,8 @@ drop:
 
 # Defines the distance to be evaluated from the stem for decaying leaves.
 max-distance-from-stem: 4
+
+# Determines the tick speed that is used.
+# The default value `random-tick-speed` uses the world's random tick speed.
+# To use a fixed value, set it to a number that is equal to or greater than 0.
+decay-speed: random-tick-speed
