@@ -119,6 +119,21 @@ public class RunnablesManager {
         });
     }
 
+    public void saveCancelAndClear() {
+        getFileConfiguration(false).ifPresent(config -> {
+            for (Map.Entry<UUID, DecayRunnable> entry : this.runnables.entrySet()) {
+                config.set(entry.getKey().toString(), entry.getValue().serialize());
+                entry.getValue().cancel();
+            }
+            this.runnables.clear();
+            try {
+                config.save(this.fileConfig);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private Optional<FileConfiguration> getFileConfiguration(boolean load) {
         FileConfiguration config = new YamlConfiguration();
         if (!load) {
