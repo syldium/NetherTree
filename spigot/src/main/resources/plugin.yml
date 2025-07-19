@@ -6,3 +6,11 @@ authors: [syldium]
 description: Decays the leaves of the Fungi trees (Nether trees)
 softdepend: [WorldGuard]
 website: https://github.com/syldium/NetherTree
+commands:
+  ntreload:
+    permission: "nethertree.admin"
+    description: "Allows reloading the configuration"
+permissions:
+  nethertree.admin:
+    description: "Allows a user to use /ntreload"
+    default: op
