@@ -25,7 +25,6 @@ public final class NetherTreePlugin extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         this.loadConfig();
-        this.treeHandler = new TreeHandler(this);
         this.getServer().getPluginManager().registerEvents(new WorldListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
         this.getServer().getPluginManager().registerEvents(new BlockRemoveListener(this), this);
@@ -36,7 +35,6 @@ public final class NetherTreePlugin extends JavaPlugin {
         } catch (ClassNotFoundException ignored) {
         }
 
-        this.runnablesManager = new RunnablesManager(this);
         this.runnablesManager.load();
 
         this.hookManager = new HookManager();
@@ -53,14 +51,6 @@ public final class NetherTreePlugin extends JavaPlugin {
         return this.runnablesManager.getRunnable(world);
     }
 
-    public RunnablesManager getRunnablesManager(){
-        return this.runnablesManager;
-    }
-
-    public void setRunnablesManager(RunnablesManager runnablesManager){
-        this.runnablesManager = runnablesManager;
-    }
-
     public boolean unregisterRunnable(DecayRunnable runnable) {
         return this.runnablesManager.unregisterRunnable(runnable);
     }
@@ -74,10 +64,16 @@ public final class NetherTreePlugin extends JavaPlugin {
         this.getConfig().options().copyDefaults(true);
         this.saveConfig();
         this.getConfig().addDefault("max-distance-from-log", 5);
-        this.dropCalculator = new DropCalculator(this.getConfig().getConfigurationSection("drop"));
+        loadConfigurableClasses();
     }
 
-    private void loadCommands(){
+    private void loadConfigurableClasses(){
+        this.dropCalculator = new DropCalculator(this.getConfig().getConfigurationSection("drop"));
+        this.runnablesManager = new RunnablesManager(this);
+        this.treeHandler = new TreeHandler(this);
+    }
+
+    private void loadCommands() {
         Objects.requireNonNull(this.getCommand("ntreload")).setExecutor(new ReloadCommand(this));
     }
 
@@ -91,5 +87,15 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     public TreeHandler getTreeHandler() {
         return this.treeHandler;
+    }
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        if (runnablesManager != null) {
+            this.runnablesManager.save();
+        }
+        loadConfigurableClasses();
+        runnablesManager.load();
     }
 }
