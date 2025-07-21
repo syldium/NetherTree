@@ -16,8 +16,8 @@ public class ReloadCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        plugin.reloadConfig();
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        this.plugin.reloadConfig();
         sender.sendMessage(ChatColor.GREEN + "Nether Tree Configuration has been reloaded!");
         return true;
     }
