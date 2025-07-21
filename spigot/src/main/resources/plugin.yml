@@ -8,9 +8,11 @@ softdepend: [WorldGuard]
 website: https://github.com/syldium/NetherTree
 commands:
   ntreload:
-    permission: "nethertree.admin"
+    permission: "nethertree.admin.reload"
     description: "Allows reloading the configuration"
 permissions:
   nethertree.admin:
-    description: "Allows a user to use /ntreload"
+    description: "Allows a user to use admin commands"
     default: op
+    children:
+      nethertree.admin.reload: true
