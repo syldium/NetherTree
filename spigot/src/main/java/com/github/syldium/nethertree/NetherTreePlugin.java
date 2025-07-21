@@ -10,6 +10,7 @@ import com.github.syldium.nethertree.listener.WorldListener;
 import com.github.syldium.nethertree.runnable.DecayRunnable;
 import com.github.syldium.nethertree.runnable.RunnablesManager;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -35,8 +36,6 @@ public final class NetherTreePlugin extends JavaPlugin {
         } catch (ClassNotFoundException ignored) {
         }
 
-        this.runnablesManager.load();
-
         this.hookManager = new HookManager();
         this.hookManager.registerHook(this.getServer().getPluginManager().getPlugin("WorldGuard"));
     }
@@ -61,15 +60,16 @@ public final class NetherTreePlugin extends JavaPlugin {
 
     private void loadConfig() {
         this.saveDefaultConfig();
-        this.getConfig().options().copyDefaults(true);
-        this.saveConfig();
-        this.getConfig().addDefault("max-distance-from-log", 5);
-        loadConfigurableClasses();
+        reloadConfig();
     }
 
-    private void loadConfigurableClasses(){
-        this.dropCalculator = new DropCalculator(this.getConfig().getConfigurationSection("drop"));
+    private void configure() {
+        FileConfiguration config = this.getConfig();
+        config.options().copyDefaults(true);
+        this.saveConfig();
+        this.dropCalculator = new DropCalculator(config.getConfigurationSection("drop"));
         this.runnablesManager = new RunnablesManager(this);
+        this.runnablesManager.load();
         this.treeHandler = new TreeHandler(this);
     }
 
@@ -92,10 +92,9 @@ public final class NetherTreePlugin extends JavaPlugin {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
-        if (runnablesManager != null) {
+        if (this.runnablesManager != null) {
             this.runnablesManager.save();
         }
-        loadConfigurableClasses();
-        runnablesManager.load();
+        this.configure();
     }
 }
